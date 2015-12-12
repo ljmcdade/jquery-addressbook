@@ -18,11 +18,13 @@ function getAddressBook(id) {
 }
 
 function getEntries(addressBookId) {
-    // TODO... perhaps by using a GET to /AddressBooks/:id/entries :)
+    return $.getJSON(API_URL + '/AddressBooks/' + addressBookId + '/entries')
+        // TODO... perhaps by using a GET to /AddressBooks/:id/entries :)
 }
 
 function getEntry(entryId) {
-    // TODO..
+    return $.getJSON(API_URL + '/Entries/' + entryId)
+        // TODO..
 }
 // End data retrieval functions
 
@@ -33,29 +35,74 @@ function getEntry(entryId) {
 function displayAddressBooksList() {
     getAddressBooks().then(
         function(addressBooks) {
-            
+
             $app.html(''); // Clear the #app div
             $app.append('<h2>Address Books List</h2>');
             $app.append('<ul>');
-            
+
             addressBooks.forEach(function(ab) {
-                $app.find('ul').append('<li data-id="' + ab.id + '">' + ab.name + '</li>');
+                $app.find('ul').append('<li data-name="' + ab.name + '"li data-id="' + ab.id + '">' + ab.name + '</li>');
             });
-            
+
             $app.find('li').on('click', function() {
                 var addressBookId = $(this).data('id');
-                displayAddressBook(addressBookId);
+                var addressBookName = $(this).data('name');
+
+                displayAddressBook(addressBookId, addressBookName);
+                //alert(addressBookId, addressBookName);
             });
+
         }
     )
 }
 
-function displayAddressBook(addressBookId) {
-    
+function displayAddressBook(addressBookId, addressBookName) {
+    //getEntries from clicked li's id
+    getEntries(addressBookId).then(
+        function(Entries) {
+            $app.html(''); // Clear the #app div
+            $app.append('<h2>Address Book Entries</h2>');
+            $app.append('<ul>');
+
+            Entries.forEach(function(entry) {
+                $app.find('ul').append('<li data-id="' + entry.id + '">' + entry.lastName + ' , ' + entry.firstName + '</li>');
+            });
+            $app.find('li').on('click', function() {
+                var selectedEntryId = $(this).data('id');
+                console.log(selectedEntryId);
+                displayEntry(selectedEntryId);
+
+            });
+        });
 }
 
-function displayEntry() {
-    
+function displayEntry(entryId) {
+    getEntry(entryId).then(
+        function(entryObj) {
+            console.log(entryObj);
+            $app.html(''); // Clear the #app div
+            $app.append('<h2>Address Book Entry</h2>');
+            $app.append('<ul>');
+
+            //viewEntry.forEach(function(ab_entry) { forEach not for objects
+            
+            // var obj = {key: "value"};
+            
+            // $(viewEntry).each(function(key, value) {
+            //     console.log("key", key, "value", value);
+
+            
+            $app.find('ul').append('<li data-id="' + entryObj.id + '">' + entryObj.lastName + ' , ' + entryObj.firstName + ' , ' + entryObj.birthday + '</li>');
+        });
+    // $app.find('li').on('click', function() {
+    //     var viewAddressBookEntry = $(this).data('id');
+
+    //     console.log(viewAddressBookEntry);
+    //     displayEntry(viewAddressBookEntry);
+
+    // });
+
+//});
 }
 // End functions that display views
 
